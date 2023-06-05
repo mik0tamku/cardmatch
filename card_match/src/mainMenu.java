@@ -8,25 +8,22 @@ import javax.swing.ImageIcon;
 
 public class mainMenu extends JFrame {
     private JPanel panel;
-    private JButton[] buttons;
-    private ImageIcon[] buttonIcons;
+    private CardButton[] buttons;
     private int[] buttonPairs;
-    private int firstButtonIndex;
+    private CardButton firstButton;
 
     public mainMenu() {
         panel = new JPanel(new GridLayout(3, 4));
         buttonPairs = new int[]{0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5}; // Match pairs for each button
-        buttonIcons = loadButtonIcons(".jpeg");
 
-        buttons = new JButton[buttonPairs.length];
+        buttons = new CardButton[buttonPairs.length];
         for (int i = 0; i < buttons.length; i++) {
-            buttons[i] = new JButton();
+            buttons[i] = new CardButton(i);
             buttons[i].setSize(80, 80);
-            buttons[i].setActionCommand(Integer.toString(i));
             buttons[i].addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    int buttonIndex = Integer.parseInt(e.getActionCommand());
-                    revealCard(buttonIndex);
+                    CardButton button = (CardButton) e.getSource();
+                    revealCard(button);
                 }
             });
             panel.add(buttons[i]);
@@ -41,8 +38,7 @@ public class mainMenu extends JFrame {
         setVisible(true);
     }
 
-    private ImageIcon[] loadButtonIcons(String imageFormat) {
-        ImageIcon[] icons = new ImageIcon[buttonPairs.length];
+    private void shuffleButtons() {
         List<Integer> indices = new ArrayList<>();
 
         // Create a list of indices for matching pairs
@@ -53,57 +49,76 @@ public class mainMenu extends JFrame {
         // Shuffle the indices randomly
         Collections.shuffle(indices);
 
-        // Load the images and assign them to buttons based on the shuffled indices
-        for (int i = 0; i < buttonPairs.length; i++) {
-            int index = indices.get(i);
-            String imagePath = "image" + (index + 1) + "." + imageFormat; // image files are named as image1.png, image2.png
-            icons[i] = new ImageIcon(imagePath);
-        }
-
-        return icons;
-    }
-
-    private void shuffleButtons() {
-        List<ImageIcon> iconList = new ArrayList<>();
-
-        // Add two copies of each button icon to the list
-        for (int i = 0; i < buttonPairs.length; i++) {
-            iconList.add(buttonIcons[i]);
-            iconList.add(buttonIcons[i]);
-        }
-
-        // Shuffle the icons randomly
-        Collections.shuffle(iconList);
-
-        // Assign the shuffled icons to the buttons
+        // Assign the shuffled indices to the buttons
         for (int i = 0; i < buttons.length; i++) {
-            buttons[i].setIcon(iconList.get(i));
+            int index = indices.get(i);
+            buttons[i].setPairIndex(buttonPairs[index]);
         }
     }
 
-    private void revealCard(int buttonIndex) {
-        buttons[buttonIndex].setIcon(buttonIcons[buttonIndex]);
+    private void revealCard(CardButton button) {
+        button.showCard();
 
-        if (firstButtonIndex == buttonIndex) {
+        if (firstButton == button) {
             return; // Clicked the same button, do nothing
         }
 
-        if (firstButtonIndex != -1) {
+        if (firstButton != null) {
             // Second card clicked, check for a match
-            if (buttonPairs[firstButtonIndex] == buttonPairs[buttonIndex]) {
+            if (firstButton.getPairIndex() == button.getPairIndex()) {
                 JOptionPane.showMessageDialog(this, "Match!");
-                buttons[firstButtonIndex].setEnabled(false);
-                buttons[buttonIndex].setEnabled(false);
+                firstButton.setEnabled(false);
+                button.setEnabled(false);
             } else {
                 JOptionPane.showMessageDialog(this, "Not a match!");
-                buttons[firstButtonIndex].setIcon(null);
-                buttons[buttonIndex].setIcon(null);
+                firstButton.hideCard();
+                button.hideCard();
             }
 
-            firstButtonIndex = -1; // Reset first card index
+            firstButton = null; // Reset first card
         } else {
             // First card clicked
-            firstButtonIndex = buttonIndex;
+            firstButton = button;
+        }
+    }
+
+    private class CardButton extends JButton {
+        private int pairIndex;
+        private ImageIcon backIcon;
+        private ImageIcon frontIcon;
+        private boolean cardShown;
+
+        public CardButton(int pairIndex) {
+            this.pairIndex = pairIndex;
+            this.cardShown = false;
+
+            backIcon = new ImageIcon("/Users/mikolajtamkun/IdeaProjects/cardmatch/card_match/images"); // image source
+            frontIcon = new ImageIcon("image." + (pairIndex + 1) + ".jpeg"); // cycles through photos for cards
+
+
+            setIcon(backIcon);
+        }
+
+        public int getPairIndex() {
+            return pairIndex;
+        }
+
+        public void setPairIndex(int pairIndex) {
+            this.pairIndex = pairIndex;
+        }
+
+        public void showCard() {
+            if (!cardShown) {
+                setIcon(frontIcon);
+                cardShown = true;
+            }
+        }
+
+        public void hideCard() {
+            if (cardShown) {
+                setIcon(backIcon);
+                cardShown = false;
+            }
         }
     }
 
