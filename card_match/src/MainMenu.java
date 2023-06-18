@@ -4,15 +4,14 @@ import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import javax.swing.ImageIcon;
 
-public class mainMenu extends JFrame {
+public class MainMenu extends JFrame {
     private JPanel panel;
     private CardButton[] buttons;
     private int[] buttonPairs;
     private CardButton firstButton;
 
-    public mainMenu() {
+    public MainMenu() {
         panel = new JPanel(new GridLayout(3, 4));
         buttonPairs = new int[]{0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5}; // Match pairs for each button
 
@@ -53,6 +52,7 @@ public class mainMenu extends JFrame {
         for (int i = 0; i < buttons.length; i++) {
             int index = indices.get(i);
             buttons[i].setPairIndex(buttonPairs[index]);
+            buttons[i].setFrontImagePath("out/production/card_match/images/image" + buttonPairs[index] + "_" + (i % 2 + 1) + ".jpg"); // Assign unique front image path to each button
         }
     }
 
@@ -92,9 +92,8 @@ public class mainMenu extends JFrame {
             this.pairIndex = pairIndex;
             this.cardShown = false;
 
-            backIcon = new ImageIcon("/Users/mikolajtamkun/IdeaProjects/cardmatch/card_match/images"); // image source
-            frontIcon = new ImageIcon("image." + (pairIndex + 1) + ".jpeg"); // cycles through photos for cards
-
+            backIcon = new ImageIcon("out/production/card_match/images/back.jpg"); // Path to the back image
+            frontIcon = null; // Assign front icon later
 
             setIcon(backIcon);
         }
@@ -105,6 +104,10 @@ public class mainMenu extends JFrame {
 
         public void setPairIndex(int pairIndex) {
             this.pairIndex = pairIndex;
+        }
+
+        public void setFrontImagePath(String frontImagePath) {
+            this.frontIcon = new ImageIcon(frontImagePath);
         }
 
         public void showCard() {
@@ -125,7 +128,7 @@ public class mainMenu extends JFrame {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                new mainMenu();
+                new MainMenu();
             }
         });
     }
