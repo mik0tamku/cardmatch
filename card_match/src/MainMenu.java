@@ -52,7 +52,7 @@ public class MainMenu extends JFrame {
         for (int i = 0; i < buttons.length; i++) {
             int index = indices.get(i);
             buttons[i].setPairIndex(buttonPairs[index]);
-            buttons[i].setFrontImagePath("out/production/card_match/images/image" + buttonPairs[index] + "_" + (i % 2 + 1) + ".jpg"); // Assign unique front image path to each button
+            buttons[i].setFrontImagePath("card_match/images/image" + buttonPairs[index] + "_" + (i % 2 + 1) + ".jpg"); // Assign unique front image path to each button
         }
     }
 
@@ -92,8 +92,8 @@ public class MainMenu extends JFrame {
             this.pairIndex = pairIndex;
             this.cardShown = false;
 
-            backIcon = new ImageIcon("out/production/card_match/images/back.jpg"); // Path to the back image
-            frontIcon = null; // Assign front icon later
+            backIcon = new ImageIcon("card_match/images/back.jpg"); // Path to the back image
+            frontIcon = null;
 
             setIcon(backIcon);
         }
