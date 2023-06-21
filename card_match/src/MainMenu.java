@@ -1,3 +1,9 @@
+/**
+ * @uthor Mikolaj Tamkun
+ *24/05/23
+ * this is a simple card matching game using images for a UI
+ **/
+
 import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
@@ -10,6 +16,7 @@ public class MainMenu extends JFrame {
     private CardButton[] buttons;
     private int[] buttonPairs;
     private CardButton firstButton;
+    private long startTime;
 
     public MainMenu() {
         panel = new JPanel(new GridLayout(3, 4));
@@ -35,6 +42,8 @@ public class MainMenu extends JFrame {
         add(panel);
         pack();
         setVisible(true);
+
+        startTime = System.currentTimeMillis(); // Record the start time of the game
     }
 
     private void shuffleButtons() {
@@ -76,13 +85,48 @@ public class MainMenu extends JFrame {
             }
 
             firstButton = null; // Reset first card
+
+            // Check if all pairs are matched
+            if (checkAllPairsMatched()) {
+                long endTime = System.currentTimeMillis();
+                long totalTime = (endTime - startTime) / 1000; // Calculate total time in seconds
+                //display end message
+                JOptionPane.showMessageDialog(this, "Game finished!\nTime taken: " + totalTime + " seconds", "Game Over", JOptionPane.INFORMATION_MESSAGE);
+                //display replay menu
+                int choice = JOptionPane.showConfirmDialog(this, "Would you like to reset the game?", "Reset Game", JOptionPane.YES_NO_OPTION);
+                if (choice == JOptionPane.YES_OPTION) {
+                    resetGame();
+                } else {
+                    setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                }
+            }
         } else {
             // First card clicked
             firstButton = button;
         }
     }
 
-    private class CardButton extends JButton {
+    private boolean checkAllPairsMatched() {
+        for (CardButton button : buttons) {
+            if (button.isEnabled()) {
+                return false; // If at least one button is still enabled, not all pairs are matched
+            }
+        }
+        return true; // All pairs are matched
+    }
+
+    private void resetGame() { //resets all cards
+        for (CardButton button : buttons) {
+            button.setEnabled(true);
+            button.hideCard();
+        }
+
+        shuffleButtons();
+
+        startTime = System.currentTimeMillis(); // Record the start time of the game
+    }
+
+    private class CardButton extends JButton { // create buttons for cards
         private int pairIndex;
         private ImageIcon backIcon;
         private ImageIcon frontIcon;
